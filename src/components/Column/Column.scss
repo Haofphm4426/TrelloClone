@@ -37,7 +37,7 @@ $column-footer-height: 46px;
         border-bottom-right-radius: 5px;
     }
 
-    ul {
+    ul.card-list {
         list-style-type: none;
         margin: 0;
         max-height: calc(100% - #{$column-header-height} - #{$column-footer-height});
