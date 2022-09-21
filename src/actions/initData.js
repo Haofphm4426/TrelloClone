@@ -1,8 +1,9 @@
+/* eslint-disable comma-dangle */
 export const initData = {
   boards: [
     {
       id: 'board-1',
-      columnOrder: ['column-1', 'column-2', 'column-2'],
+      columnOrder: ['column-1', 'column-2', 'column-3'],
       columns: [
         {
           id: 'column-1',
