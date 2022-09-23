@@ -12,4 +12,10 @@ body {
     overflow: hidden;
     line-height: 1.3rem;
     background-color: $board-bg-color;
+    color: $main-color;
+
+    .icon {
+        font-size: 14px;
+        margin-right: 5px;
+    }
 }

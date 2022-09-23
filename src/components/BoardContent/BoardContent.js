@@ -6,6 +6,7 @@ import './BoardContent.scss';
 
 import Column from 'components/Column/Column';
 import { mapOrder } from 'utilities/sorts';
+import { applyDrag } from 'utilities/dragDrop';
 
 import { initData } from 'actions/initData';
 
@@ -18,9 +19,9 @@ function BoardContent() {
         if (boardFormDB) {
             setBoard(boardFormDB);
 
-            //sort column
-            mapOrder(boardFormDB.columns, boardFormDB.columnOrder, 'id');
             setColumns(boardFormDB.columns);
+            //sort column
+            boardFormDB.columns = mapOrder(boardFormDB.columns, boardFormDB.columnOrder, 'id');
         }
     }, []);
 
@@ -29,7 +30,27 @@ function BoardContent() {
     }
 
     const onColumnDrop = (dropResult) => {
-        console.log(dropResult);
+        let newColumns = [...columns];
+        newColumns = applyDrag(newColumns, dropResult);
+
+        let newBoard = { ...board };
+        newBoard.columnOrder = newColumns.map((c) => c.id);
+        newBoard.columns - newColumns;
+
+        setColumns(newColumns);
+        setBoard(newBoard);
+    };
+
+    const onCardDrop = (id, dropResult) => {
+        //Vòng lặp sẽ lặp qua tất cả các cột
+        if (dropResult.removedIndex != null || dropResult.addedIndex != null) {
+            let newColumns = [...columns];
+
+            let curColumns = newColumns.find((c) => c.id === id);
+            curColumns.cards = applyDrag(curColumns.cards, dropResult);
+            curColumns.cardOrder = curColumns.cards.map((i) => i.id);
+            setColumns(newColumns);
+        }
     };
 
     return (
@@ -37,9 +58,7 @@ function BoardContent() {
             <Container
                 orientation="horizontal"
                 onDrop={onColumnDrop}
-                getChildPayload={(index) => {
-                    columns[index];
-                }}
+                getChildPayload={(index) => columns[index]}
                 dragHandleSelector=".column-drag-handle" //class for tag which is used for drag
                 dropPlaceholder={{
                     animationDuration: 150,
@@ -49,10 +68,14 @@ function BoardContent() {
             >
                 {columns.map((column, idx) => (
                     <Draggable key={idx}>
-                        <Column column={column} />
+                        <Column column={column} onCardDrop={onCardDrop} />
                     </Draggable>
                 ))}
             </Container>
+            <div className="add-new-column">
+                <i className="fa fa-plus icon" />
+                Add another column
+            </div>
         </div>
     );
 }
