@@ -34,7 +34,10 @@ function Column({ column, onCardDrop }) {
                 </Container>
             </div>
             <footer>
-                <div className="footer-action"></div>
+                <div className="footer-action">
+                    <i className="fa fa-plus icon" />
+                    Add another column
+                </div>
             </footer>
         </div>
     );
