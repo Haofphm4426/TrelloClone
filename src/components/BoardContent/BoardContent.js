@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef, useCallback } from 'react';
+import { React, useState, useEffect, useRef } from 'react';
 import { Container, Draggable } from 'react-smooth-dnd';
 import { Container as BootstrapContainer, Row, Col, Form, Button } from 'react-bootstrap';
 
@@ -16,6 +16,9 @@ function BoardContent() {
     const [board, setBoard] = useState({});
     const [columns, setColumns] = useState([]);
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
+    const toggleOpenForm = () => {
+        setOpenNewColumnForm(!openNewColumnForm);
+    };
 
     const newColumnInputRef = useRef(null);
 
@@ -33,7 +36,6 @@ function BoardContent() {
     }, []);
 
     useEffect(() => {
-        console.log(newColumnInputRef);
         if (newColumnInputRef && newColumnInputRef.current) {
             newColumnInputRef.current.focus();
             newColumnInputRef.current.select();
@@ -68,10 +70,6 @@ function BoardContent() {
         }
     };
 
-    const toggleOpenForm = () => {
-        setOpenNewColumnForm(!openNewColumnForm);
-    };
-
     const addNewColumn = () => {
         if (!newColumnTitle) {
             newColumnInputRef.current.focus();
@@ -99,11 +97,12 @@ function BoardContent() {
     };
 
     const onUpdateColumn = (newColumnToUpdate) => {
+        //Get id from newColumn
         const columnIdToUpdate = newColumnToUpdate.id;
 
+        //Find index
         let newColumns = [...columns];
         const columnIdexToUpdate = newColumns.findIndex((i) => i.id === columnIdToUpdate);
-        console.log(columnIdexToUpdate);
 
         if (newColumnToUpdate._destroy) {
             newColumns.splice(columnIdexToUpdate, 1);
@@ -112,12 +111,13 @@ function BoardContent() {
         }
 
         let newBoard = { ...board };
-        newBoard.columnOrder = newColumns.map((c) => c.id);
+        newBoard.columnOrder = newColumns.map((column) => column.id);
         newBoard.columns = newColumns;
 
         setColumns(newColumns);
         setBoard(newBoard);
     };
+
     return (
         <div className="board-content">
             <Container
@@ -165,7 +165,7 @@ function BoardContent() {
                                 <Button variant="success" size="sm" onClick={addNewColumn}>
                                     Add column
                                 </Button>
-                                <span className="cancel-new-column">
+                                <span className="cancel-icon ">
                                     <i className="fa fa-trash icon" onClick={toggleOpenForm}></i>
                                 </span>
                             </div>

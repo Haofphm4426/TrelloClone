@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Draggable } from 'react-smooth-dnd';
-import { Dropdown, Form } from 'react-bootstrap';
+import { Dropdown, Form, Button } from 'react-bootstrap';
+import { cloneDeep } from 'lodash';
 
 import Card from 'components/Card/Card';
 import ConfirmModal from 'components/Common/ConfirmModal';
@@ -19,9 +20,25 @@ function Column({ column, onCardDrop, onUpdateColumn }) {
 
     const [columnTitle, setColumnTitle] = useState(column.title);
 
+    const [openNewCardForm, setOpenNewCardForm] = useState(false);
+    const toggleOpenNewCardForm = () => {
+        setOpenNewCardForm(!openNewCardForm);
+    };
+
+    const newCardTextAreaRef = useRef(null);
+
+    const [newCardTitle, setNewCardTitle] = useState('');
+
     useEffect(() => {
         setColumnTitle(column.title);
     }, [column.title]);
+
+    useEffect(() => {
+        if (newCardTextAreaRef && newCardTextAreaRef.current) {
+            newCardTextAreaRef.current.focus();
+            newCardTextAreaRef.current.select();
+        }
+    }, [openNewCardForm]);
 
     const onConfirmModalAction = (type) => {
         if (type === MODAL_ACTION_CONFIRM) {
@@ -42,6 +59,29 @@ function Column({ column, onCardDrop, onUpdateColumn }) {
         };
 
         onUpdateColumn(newColumn);
+    };
+
+    const addNewCard = () => {
+        if (!newCardTitle) {
+            newCardTextAreaRef.current.focus();
+            return;
+        }
+
+        const newCardToAdd = {
+            id: Math.random().toString(36).substr(2, 5), // random characters
+            boardId: column.boardId,
+            columnId: column.id,
+            title: newCardTitle.trim(),
+            cover: null,
+        };
+
+        let newColumn = cloneDeep(column);
+        newColumn.cards.push(newCardToAdd);
+        newColumn.cardOrder.push(newCardToAdd.id);
+
+        onUpdateColumn(newColumn);
+        setNewCardTitle('');
+        toggleOpenNewCardForm();
     };
 
     return (
@@ -97,13 +137,40 @@ function Column({ column, onCardDrop, onUpdateColumn }) {
                         </Draggable>
                     ))}
                 </Container>
+                {openNewCardForm && (
+                    <div className="add-new-card-area">
+                        <Form.Control
+                            size="sm"
+                            as="textarea"
+                            rows="3"
+                            placeholder="Enter card title"
+                            className="textarea-enter-new-card"
+                            ref={newCardTextAreaRef}
+                            value={newCardTitle}
+                            onChange={(e) => setNewCardTitle(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addNewCard()}
+                        />
+                        <div className="d-flex mb-2">
+                            <Button variant="success" size="sm" onClick={addNewCard}>
+                                Add card
+                            </Button>
+                            <span className="cancel-icon" onClick={toggleOpenNewCardForm}>
+                                <i className="fa fa-trash icon"></i>
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
-            <footer>
-                <div className="footer-action">
-                    <i className="fa fa-plus icon" />
-                    Add another column
-                </div>
-            </footer>
+
+            {!openNewCardForm && (
+                <footer>
+                    <div className="footer-action" onClick={toggleOpenNewCardForm}>
+                        <i className="fa fa-plus icon" />
+                        Add another card
+                    </div>
+                </footer>
+            )}
+
             <ConfirmModal
                 show={showModal}
                 onAction={onConfirmModalAction}
