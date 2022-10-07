@@ -11,7 +11,7 @@ import { saveContentAfterPressEnter, selectAllInlineText } from 'utilities/conte
 import './Column.scss';
 
 function Column({ column, onCardDrop, onUpdateColumn }) {
-    const cards = mapOrder(column.cards, column.cardOrder, 'id');
+    const cards = mapOrder(column.cards, column.cardOrder, '_id');
 
     const [showModal, setShowModal] = useState(false);
     const toggleShowModal = () => {
@@ -70,14 +70,14 @@ function Column({ column, onCardDrop, onUpdateColumn }) {
         const newCardToAdd = {
             id: Math.random().toString(36).substr(2, 5), // random characters
             boardId: column.boardId,
-            columnId: column.id,
+            columnId: column._id,
             title: newCardTitle.trim(),
             cover: null,
         };
 
         let newColumn = cloneDeep(column);
         newColumn.cards.push(newCardToAdd);
-        newColumn.cardOrder.push(newCardToAdd.id);
+        newColumn.cardOrder.push(newCardToAdd._id);
 
         onUpdateColumn(newColumn);
         setNewCardTitle('');
@@ -122,7 +122,7 @@ function Column({ column, onCardDrop, onUpdateColumn }) {
                 <Container
                     groupName="col"
                     orientation="vertical"
-                    onDrop={(dropResult) => onCardDrop(column.id, dropResult)}
+                    onDrop={(dropResult) => onCardDrop(column._id, dropResult)}
                     getChildPayload={(index) => cards[index]}
                     dragClass="card-ghost"
                     dropClass="card-ghost-drop"
