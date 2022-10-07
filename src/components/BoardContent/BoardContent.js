@@ -99,7 +99,9 @@ function BoardContent() {
 
         //Find index
         let newColumns = [...columns];
-        const columnIdexToUpdate = newColumns.findIndex((i) => i._id === columnIdToUpdate);
+        const columnIdexToUpdate = newColumns.findIndex((i) => {
+            return i._id === columnIdToUpdate;
+        });
 
         if (newColumnToUpdate._destroy) {
             newColumns.splice(columnIdexToUpdate, 1);
